@@ -7,8 +7,8 @@ Brianna Gunn - bgunn7
 Jacob Kutch - jkutch326
 Marcus Bridgman - mb3668
 
-Framework Language and Database:
-Django, Python, postgreSQL
+Framework, Languages, and Database:
+Django, Python, postgreSQL, HTML, CSS
 
 Description:
 This is the github for group 5 of the ISE project. 
