@@ -5,8 +5,10 @@ urlpatterns = [
     path('', views.home, name = 'home'),
 ]
 
+
+
 urlpatterns += [
-    path('login', views.login_request, name  = 'login')
+    path('login/', views.login_request, name  = 'login')
 ]
 
 urlpatterns += [
@@ -20,3 +22,4 @@ urlpatterns += [
 urlpatterns += [
     path('logout', views.logout_request, name = 'logout')
 ]
+

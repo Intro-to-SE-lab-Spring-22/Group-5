@@ -1,13 +1,12 @@
-
 {% extends "base.html" %}
 {% block content %}
+<div class="text-center">
   <h1>Rally Home Page</h1>
   {%if not user.is_authenticated%}
-  <h2> <a href= "/login/login"> Login</a> </h2>
   <h2> <a href= "/login/signup"> Create an account</a> </h2>
+  <h2> <a href= "/login/login"> Login</a> </h2>
   {%endif%}
-  <p>User Count</p>
-  <ul>
-    <li><strong>Suggested Friends:</strong> {{ list_users }}</li>
-  </ul>
+</div>
+<div class="text-left">
+</div>
 {% endblock %}

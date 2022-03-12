@@ -29,7 +29,7 @@ urlpatterns += [
 #Add URL maps to redirect the base URL to our application
 from django.views.generic import RedirectView
 urlpatterns += [
-    path('', RedirectView.as_view(url='home/', permanent=True)),
+    path('', RedirectView.as_view(url='home', permanent=True)),
 ]
 
 # Use static() to add url mapping to serve static files during development (only)
@@ -38,9 +38,6 @@ from django.conf.urls.static import static
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-urlpatterns += [
-    path('login/', include('login.urls')),
-]
 
 urlpatterns += [
     path('accounts/', include('django.contrib.auth.urls')),
@@ -48,4 +45,12 @@ urlpatterns += [
 
 urlpatterns += [
     path('register/', include('login.urls'))
+]
+
+urlpatterns += [
+    path('home/', include('login.urls'))
+]
+
+urlpatterns += [
+    path('friendship/', include('friendship.urls'))
 ]

@@ -1,12 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Create New Account</h2>
 
-<form method="post">
+<div class="jumbotron jumbotron-fluid">
+  <div class="py-5 container">
+    <h2>Create New Account</h2>
+
+
+<body class="body_login">
+  <form method="post" class="form-signup">
     {% csrf_token %}
-    {{form}}
-    <input type="submit" value="Register">
-</form>
+    <p>
+        {{ form.username.label_tag }}
+        {{ form.username}}
+        </p>
+    
+        <p> 
+        {{ form.email.label_tag }}
+        {{ form.email }}
+        </p>
+    
+        <p>
+        {{ form.password1.label_tag }}
+        {{ form.password1 }}
+        </p>
+    
+        <p>
+        {{ form.password2.label_tag }}
+        {{ form.password2 }}
+        </p>
+        <input type = "submit" value = "register" />
+  </form>
+</body>
 
-<a href="{% url 'login' %}">Back to home</a>
+    <a href="{% url 'home' %}">Back to home</a>
+
+    </div>
+</div>
 {% endblock %}

@@ -6,12 +6,16 @@ from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic.edit import CreateView
 from django.shortcuts import  render, redirect
-from .forms import NewUserForm
 from django.contrib.auth import login, authenticate #add this
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm #add this
-
+from django.contrib.auth.models import User
+from friendship.models import Friend, Follow, Block
+from .models import CustomAuthenticationForm, CustomUserCreationForm
 # Create your views here.
+
+
+
 def home(request):
     num_users = User.objects.all().count()
     list_users = []
@@ -26,7 +30,7 @@ def home(request):
 
 def login_request(request):
 	if request.method == "POST":
-		form = AuthenticationForm(request, data=request.POST)
+		form = CustomAuthenticationForm(request, data=request.POST)
 		if form.is_valid():
 			username = form.cleaned_data.get('username')
 			password = form.cleaned_data.get('password')
@@ -39,7 +43,7 @@ def login_request(request):
 				messages.error(request,"Invalid username or password.")
 		else:
 			messages.error(request,"Invalid username or password.")
-	form = AuthenticationForm()
+	form = CustomAuthenticationForm()
 	return render(request=request, template_name="login.html", context={"login_form":form})
 
 def logout_request(request):
@@ -53,8 +57,9 @@ def profile(request):
     }
     return render(request, 'profile.html', context = context)
     
+    
 
 class SignUp(CreateView):
-    form_class = UserCreationForm
-    success_url = reverse_lazy("login")
-    template_name = "register.html"
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy('login')
+    template_name = 'register.html'
