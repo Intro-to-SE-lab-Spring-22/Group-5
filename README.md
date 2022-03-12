@@ -8,7 +8,7 @@ Jacob Kutch - jkutch326
 Marcus Bridgman - mb3668
 
 Framework, Languages, and Database:
-Django, Python, postgreSQL, HTML, CSS
+Django, Python, SQLite3, HTML, CSS
 
 Description:
 This is the github for group 5 of the ISE project. 
