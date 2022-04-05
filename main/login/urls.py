@@ -23,3 +23,10 @@ urlpatterns += [
     path('logout', views.logout_request, name = 'logout')
 ]
 
+urlpatterns += [
+    path('deletepost/<int:pk>', views.deletePost, name = 'deletepost')
+]
+
+urlpatterns += [
+    path('editpost/<int:pk>', views.EditPostView.as_view(), name = 'editpost')
+]

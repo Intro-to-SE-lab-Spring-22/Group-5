@@ -1,6 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
+  <div class="center">
+    <form method ="POST">
+      {% csrf_token %}
+      <h1>Create new post</h1>
+      <div class="jumbotron">
+      <p>
+        {{form.title.label_tag}}
+        {{form.title}} <br>
 
-  this is your profile
-
+        {{form.content}}
+      </p>
+      <input type="submit" value="Post">
+    </div>
+      <h1> Your Latest Posts </h1>    
+      {% for post in posts %}
+      <div class="jumbotron">
+        <p> 
+          <div class="center">
+          <h2>{{post.title}}</h2>
+          </div>
+          {{post.content}}<br>
+          <a href="{% url 'deletepost' post.pk%}">Delete</a>
+          <a href="{% url 'editpost' post.pk%}">Edit</a>
+        </p>
+        <br>
+      </div>
+      {% endfor %}
+    </form>
+ </div>
 {% endblock %}

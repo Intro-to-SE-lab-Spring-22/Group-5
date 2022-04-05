@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import ArrayField
 # Create your models here.
 
 class CustomAuthenticationForm(AuthenticationForm):
@@ -29,3 +30,8 @@ class CustomUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+class Post(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True)

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import login, logout
 from django.contrib import messages
@@ -11,7 +11,9 @@ from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm #add this
 from django.contrib.auth.models import User
 from friendship.models import Friend, Follow, Block
-from .models import CustomAuthenticationForm, CustomUserCreationForm
+from .models import CustomAuthenticationForm, CustomUserCreationForm, Post
+from .forms import PostForm
+from django.views.generic import UpdateView
 # Create your views here.
 
 
@@ -38,12 +40,12 @@ def login_request(request):
 			if user is not None:
 				login(request, user)
 				messages.info(request, f"You are now logged in as {username}.")
-				return redirect("home")
+				return redirect("profile")
 			else:
 				messages.error(request,"Invalid username or password.")
 		else:
 			messages.error(request,"Invalid username or password.")
-	form = CustomAuthenticationForm()
+	if request.method != 'POST': form = CustomAuthenticationForm()
 	return render(request=request, template_name="login.html", context={"login_form":form})
 
 def logout_request(request):
@@ -52,12 +54,51 @@ def logout_request(request):
     return redirect('home')
 
 def profile(request):
-    context = {
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.user = request.user
+            instance.save()
+            return redirect('profile')
+    else:
+        form = PostForm()
 
+    posts = list(reversed(Post.objects.filter(user = request.user)))
+    
+    context = {
+        'posts': posts,
+        'form': form
     }
     return render(request, 'profile.html', context = context)
-    
-    
+
+def deletePost(request, pk):
+    post = Post.objects.get(pk=pk)
+    post.delete()
+    return redirect('profile')
+
+def editPost(request, pk):
+    form = EditPostForm(request.POST, pk)
+    context = {
+        'form': form
+    }
+    return render(request, 'editpost.html', context = context)
+
+class EditPostView(UpdateView):
+    model = Post
+    form_class = PostForm
+    template_name = "editpost.html"
+
+    def get_object(self, *args, **kwargs):
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
+
+        # We can also get user object using self.request.user  but that doesnt work
+        # for other models.
+
+        return post
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse_lazy("profile")
 
 class SignUp(CreateView):
     form_class = CustomUserCreationForm
