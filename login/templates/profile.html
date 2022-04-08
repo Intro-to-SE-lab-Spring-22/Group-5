@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+{% load friendshiptags %}
+
+  <div class="friend_search" style="position: absolute; left: 1px; top: 20px">
+  <form action="" method ="POST">
+    <p style="text-align: center"> Search Friend to Add </p>
+    {% csrf_token %}
+    <input type="text" name="username_search" />
+    <input type="submit" />
+    <br />
+    {% for i in search %}
+      {% if i.username != request.user.username %}
+        {{i.username}} <a href="{% url 'addfriend' i.pk%}">Send Friend Request</a> <br />
+      {% endif %}
+    {% endfor %}
+
+  </form>
+  </div>
+
+  <div class="incoming_friend_request" style="position: absolute; left: 1px; top: 40px">
+    <p>hi</p>
+  </div>
+
+  <div class="center">
+    <form method ="POST">
+      {% csrf_token %}
+      <h1>Create new post</h1>
+      <div class="jumbotron">
+      <p>
+        {{form.title.label_tag}}
+        {{form.title}} <br>
+
+        {{form.content}}
+      </p>
+      <input type="submit" value="Post">
+    </div>
+      <h1> Your Latest Posts </h1>
+      {% for post in posts %}
+      <div class="jumbotron">
+        <p>
+          <div class="center">
+          <h2>{{post.title}}</h2>
+          </div>
+          {{post.content}}<br>
+          <a href="{% url 'deletepost' post.pk%}">Delete</a>
+          <a href="{% url 'editpost' post.pk%}">Edit</a>
+        </p>
+        <br>
+      </div>
+      {% endfor %}
+    </form>
+ </div>
+{% endblock %}
