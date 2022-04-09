@@ -1,6 +1,9 @@
 from django.urls import path
 from . import views
 
+
+
+
 urlpatterns = [
     path('', views.home, name = 'home'),
 ]
@@ -29,4 +32,8 @@ urlpatterns += [
 
 urlpatterns += [
     path('editpost/<int:pk>', views.EditPostView.as_view(), name = 'editpost')
+]
+
+urlpatterns += [
+    path('likepost/<int:pk>', views.likePost, name = 'likepost')
 ]

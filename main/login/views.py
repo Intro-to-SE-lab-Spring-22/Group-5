@@ -55,7 +55,7 @@ def logout_request(request):
 
 def profile(request):
     if request.method == "POST":
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.user = request.user
@@ -65,10 +65,10 @@ def profile(request):
         form = PostForm()
 
     posts = list(reversed(Post.objects.filter(user = request.user)))
-    
+ 
     context = {
         'posts': posts,
-        'form': form
+        'form': form,
     }
     return render(request, 'profile.html', context = context)
 
@@ -84,6 +84,10 @@ def editPost(request, pk):
     }
     return render(request, 'editpost.html', context = context)
 
+def likePost(request, pk):
+    context = {}
+    return render(request, 'likepost.html', context = context)
+
 class EditPostView(UpdateView):
     model = Post
     form_class = PostForm
@@ -91,10 +95,8 @@ class EditPostView(UpdateView):
 
     def get_object(self, *args, **kwargs):
         post = get_object_or_404(Post, pk=self.kwargs['pk'])
-
-        # We can also get user object using self.request.user  but that doesnt work
+        # We can also get user object us\ng self.request.user  but that doesnt work
         # for other models.
-
         return post
 
     def get_success_url(self, *args, **kwargs):
@@ -104,3 +106,9 @@ class SignUp(CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')
     template_name = 'register.html'
+
+def friend(request):
+    request.POST['username']
+    #input from form = usertosearch
+    users = User.objects.filter(username='conner')
+    #display on template(users)

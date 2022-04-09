@@ -31,7 +31,19 @@ class CustomUserCreationForm(UserCreationForm):
             user.save()
         return user
 
+class PostManager(models.Manager):
+    def likes(self):
+        post = Post.objects.get(self)
+        return Like.objects.filter(post=post).count() + 1
+        
 class Post(models.Model):
-    title = models.CharField(max_length=100)
     content = models.TextField()
+    image = models.ImageField(null=True, blank=True, upload_to='images/')
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True)
+
+    objects = PostManager()
+
+
+class Like(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
