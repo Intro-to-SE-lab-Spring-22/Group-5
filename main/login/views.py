@@ -10,23 +10,27 @@ from django.contrib.auth import login, authenticate #add this
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm #add this
 from django.contrib.auth.models import User
-from friendship.models import Friend, Follow, Block
+from friendship.models import Friend, Follow, Block, FriendshipRequest
 from .models import CustomAuthenticationForm, CustomUserCreationForm, Post
-from .forms import PostForm
+from .forms import PostForm, CommentForm
 from django.views.generic import UpdateView
 # Create your views here.
 
 
 
 def home(request):
-    num_users = User.objects.all().count()
-    list_users = []
-    for x in User.objects.all():
-        if x.get_username() != request.user.get_username():
-            list_users.append(x.get_username())
+    if request.user.is_authenticated:
+        friends = Friend.objects.friends(request.user)
+        friends.append(request.user) 
+        ordered_posts = Post.objects.order_by('-created_at')
+        posts = list(ordered_posts.filter(user__in = friends))
+        friends = Friend.objects.friends(request.user)
+    else:
+        posts = []
+        friends = []
     context = {
-        'num_users': num_users,
-        'list_users': list_users,
+        'posts': posts,
+        'friends': friends,
     }
     return render(request, 'home.html', context = context)
 
@@ -63,12 +67,18 @@ def profile(request):
             return redirect('profile')
     else:
         form = PostForm()
-
+    friends = Friend.objects.friends(request.user)
     posts = list(reversed(Post.objects.filter(user = request.user)))
- 
+    username = request.POST.get('username_search',False)
+    search = list(User.objects.filter(username = username))
+    friendRequests = Friend.objects.unread_requests(request.user)
+
     context = {
         'posts': posts,
         'form': form,
+        'search': search,
+        'friends': friends,
+        'friendrequests': friendRequests,
     }
     return render(request, 'profile.html', context = context)
 
@@ -84,9 +94,33 @@ def editPost(request, pk):
     }
     return render(request, 'editpost.html', context = context)
 
-def likePost(request, pk):
-    context = {}
-    return render(request, 'likepost.html', context = context)
+def addComment(request, pk):
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.post = Post.objects.get(pk=pk)
+            instance.user = request.user
+            instance.save()
+            return redirect('/')
+    else:
+        form = CommentForm()
+    
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'addcomment.html', context = context)
+
+def likePostHome(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    post.likes.add(request.user)
+    return redirect('/')
+
+def likePostProfile(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    post.likes.add(request.user)
+    return redirect('profile')
 
 class EditPostView(UpdateView):
     model = Post
@@ -107,8 +141,28 @@ class SignUp(CreateView):
     success_url = reverse_lazy('login')
     template_name = 'register.html'
 
-def friend(request):
-    request.POST['username']
-    #input from form = usertosearch
-    users = User.objects.filter(username='conner')
-    #display on template(users)
+def addFriend(request, pk):
+    other_user = User.objects.get(pk=pk)
+    list = Friend.objects.sent_requests(user=request.user)
+    for friend in list:
+        if friend.to_user==other_user:
+            messages.info(request, "You already sent a request to " + other_user.username)
+            return(redirect("profile"))
+    if Friend.objects.are_friends(request.user, other_user) == False:
+        Friend.objects.add_friend(
+            request.user,
+            other_user
+        )
+        messages.info(request, "Sent friend request")
+        return redirect('profile')
+    else:
+        messages.info(request, "You are already friends!")
+        return(redirect("profile"))
+
+    return render(request, 'addfriend.html')
+
+def acceptFriend(request, pk):
+    friend_request = FriendshipRequest.objects.get(pk=pk)
+    friend_request.accept()
+    messages.info(request, "Accepted friend request")
+    return redirect('profile')

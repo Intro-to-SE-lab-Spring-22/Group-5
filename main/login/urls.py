@@ -35,5 +35,21 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    path('likepost/<int:pk>', views.likePost, name = 'likepost')
+    path('likepost/<int:pk>', views.likePostProfile, name = 'likepost')
+]
+
+urlpatterns += [
+    path('likepostH/<int:pk>', views.likePostHome, name = 'likepostH')
+]
+
+urlpatterns += [
+    path('addcomment/<int:pk>', views.addComment, name = 'addcomment')
+]
+
+urlpatterns += [
+    path('addfriend/<int:pk>', views.addFriend, name = 'addfriend')
+]
+
+urlpatterns += [
+    path('acceptfriend/<int:pk>', views.acceptFriend, name = 'acceptfriend')
 ]

@@ -1,5 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
+{% load friendshiptags %}
+<div class="friends" style="position: absolute; left: 1px; top: 40px">
+  <p>Friends</p> <hr>
+  {% for friend in friends %}
+    <strong>{{friend.username}}</strong>
+  {% endfor %}
+</div>
+<div class="friend_search" style="position: absolute; left: 1px; top: 150px">
+  <form action="" method ="POST">
+    <p style="text-align: center"> Search Friend to Add </p>
+    {% csrf_token %}
+    <input type="text" name="username_search" />
+    <input type="submit" />
+    <br />
+    {% for i in search %}
+      {% if i.username != request.user.username %}
+        {{i.username}} <a class="btn btn-primary" href="{% url 'addfriend' i.pk%}">Send Friend Request</a> <br />
+      {% endif %}
+    {% endfor %}
+
+  </form>
+  </div>
+  <div class="incoming_friend_request" style="position: absolute; left: 1px; top: 400px">
+    <p>Incoming Friend Requests</p> <hr>
+    {% for friend in friendrequests %}
+      {{friend.from_user.username}} <a href="{% url 'acceptfriend' friend.pk%}" class="btn btn-primary"> Accept</a><br>
+    {% endfor %}
+  </div>
   <div class="center">
     <form method ="POST" enctype="multipart/form-data">
       {% csrf_token %}
@@ -15,21 +43,20 @@
       {% for post in posts %}
       <div class="jumbotron">
         <p> 
-
           {% if post.image %}
           <img src="{{ post.image.url }}" class="img-responsive" width = "100" height = "400" style="width: 100%; float: left; margin-right: 10px;" />
           {% endif %}
           {{post.content}}<br>
-          <a href="{% url 'deletepost' post.pk%}">Delete</a>
-          <a href="{% url 'editpost' post.pk%}">Edit</a>
+          <a href="{% url 'deletepost' post.pk%}" class="btn btn-primary"> Delete</a>
+          <a href="{% url 'editpost' post.pk%}" class="btn btn-primary"> Edit</a>
         </p>
         <br>
         <div class="row push-to-bottom">
-          <div class="col-md-6">
+          <div class="col-md-6", align=left>
+            {{post.created_at}}
           </div>
           <div class="col-md-6">
-            <a href="{% url 'likepost' post.pk%}">Like</a>
-            -{{post.objects.likes}}
+            <a href="{% url 'likepost' post.pk%}" class="btn btn-primary">Like</a> {{post.likes.count}}
           </div>
         </div>
       </div>
