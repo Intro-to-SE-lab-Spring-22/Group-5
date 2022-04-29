@@ -50,8 +50,8 @@
 <body>
   {% include 'messages.html' %}
 
-      
-    
+
+
 
     {% block content %}{% endblock %}
     <nav class="navbar fixed-bottom" style="background-color:#75b1d1">
@@ -60,6 +60,7 @@
       <a class="btn btn-primary"> Logged in as: {{user.get_username}} </a>
       <a class="btn btn-primary" href="logout"> Logout</a>
       <a class="btn btn-primary" href="profile">Profile</a>
+      <a class="btn btn-primary" href="{% url 'inbox' %}">Inbox</a>
       {% endif %}
       <a class="btn btn-primary" href="/login">Home</a>
       {% endblock %}

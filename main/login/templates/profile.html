@@ -4,9 +4,10 @@
 <div class="friends" style="position: absolute; left: 1px; top: 40px">
   <p>Friends</p> <hr>
   {% for friend in friends %}
-    <strong>{{friend.username}}</strong>
+    <strong>{{friend.username}} | </strong>
   {% endfor %}
 </div>
+
 <div class="friend_search" style="position: absolute; left: 1px; top: 150px">
   <form action="" method ="POST">
     <p style="text-align: center"> Search Friend to Add </p>
@@ -16,7 +17,7 @@
     <br />
     {% for i in search %}
       {% if i.username != request.user.username %}
-        {{i.username}} <a class="btn btn-primary" href="{% url 'addfriend' i.pk%}">Send Friend Request</a> <br />
+        {{i.username}} <a class="btn btn-primary" href="{% url 'addfriend' i.pk %}">Send Friend Request</a> <br />
       {% endif %}
     {% endfor %}
 
@@ -42,7 +43,7 @@
       <h1> Your Latest Posts </h1>
       {% for post in posts %}
       <div class="jumbotron">
-        <p> 
+        <p>
           {% if post.image %}
           <img src="{{ post.image.url }}" class="img-responsive" width = "100" height = "400" style="width: 100%; float: left; margin-right: 10px;" />
           {% endif %}

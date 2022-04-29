@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  {{friend.username}}
+</div>
+
+<div class=""></div>
+
+<div class="body">
+  {% if directmessage.user %}
+    <div class="user">
+      <p style="text-align: right">{{Directmessage.sent_at}} | {{directmessage.message}}</p>
+    </div>
+  {% else %}
+    <div class="other_user">
+      <p style="text-align: left">{{Directmessage.sent_at}} | {{directmessage.message}}</p>
+  {% endif %}
+</div>
+
+{% endblock %}

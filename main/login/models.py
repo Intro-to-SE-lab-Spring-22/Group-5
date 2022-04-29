@@ -31,7 +31,7 @@ class CustomUserCreationForm(UserCreationForm):
             user.save()
         return user
 
-        
+
 class Post(models.Model):
     content = models.TextField()
     image = models.ImageField(null=True, blank=True, upload_to='images/')
@@ -45,3 +45,15 @@ class Comment(models.Model):
     content = models.TextField()
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
+
+class ThreadModel(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='+')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='+')
+
+class MessageModel(models.Model):
+    thread = models.ForeignKey('ThreadModel', related_name='+', on_delete=models.CASCADE, blank=True, null=True)
+    sender_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='+')
+    receiver_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='+')
+    body = models.CharField(max_length=1000)
+    date = models.DateTimeField(auto_now_add=True, null=True)
+    is_read = models.BooleanField(default=False)

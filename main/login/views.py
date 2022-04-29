@@ -11,9 +11,12 @@ from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm #add this
 from django.contrib.auth.models import User
 from friendship.models import Friend, Follow, Block, FriendshipRequest
-from .models import CustomAuthenticationForm, CustomUserCreationForm, Post
-from .forms import PostForm, CommentForm
+from .models import CustomAuthenticationForm, CustomUserCreationForm, Post, ThreadModel, MessageModel
+from .forms import PostForm, CommentForm, ThreadForm, MessageForm
 from django.views.generic import UpdateView
+from django.db.models import Q
+from django.views import View
+
 # Create your views here.
 
 
@@ -21,7 +24,7 @@ from django.views.generic import UpdateView
 def home(request):
     if request.user.is_authenticated:
         friends = Friend.objects.friends(request.user)
-        friends.append(request.user) 
+        friends.append(request.user)
         ordered_posts = Post.objects.order_by('-created_at')
         posts = list(ordered_posts.filter(user__in = friends))
         friends = Friend.objects.friends(request.user)
@@ -105,7 +108,7 @@ def addComment(request, pk):
             return redirect('/')
     else:
         form = CommentForm()
-    
+
     context = {
         'form': form,
     }
@@ -166,3 +169,80 @@ def acceptFriend(request, pk):
     friend_request.accept()
     messages.info(request, "Accepted friend request")
     return redirect('profile')
+
+class ListThreads(View):
+    def get(self, request, *args, **kwargs):
+        threads = ThreadModel.objects.filter(Q(user=request.user) | Q(receiver=request.user))
+
+        context = {
+            'threads':threads
+        }
+
+        return render(request, 'inbox.html', context=context)
+
+class CreateThread(View):
+    def get(self, request, *args, **kwargs):
+        form = ThreadForm()
+
+        context = {
+            'form': form
+        }
+
+        return render(request, 'create_thread.html', context=context)
+
+    def post(self, request, *args, **kwargs):
+        form = ThreadForm(request.POST)
+
+        username = request.POST.get('username')
+
+        try:
+            receiver = User.objects.get(username=username)
+            if ThreadModel.objects.filter(user=request.user, receiver=receiver).exists():
+                thread = ThreadModel.objects.filter(user=request.user, receiver=receiver)[0]
+                return redirect('thread', pk=thread.pk)
+            elif ThreadModel.objects.filter(user=receiver, receiver=request.user).exists():
+                thread = ThreadModel.objects.filter(user=receiver, receiver=request.user)[0]
+                return redirect('thread', pk=thread.pk)
+
+            if form.is_valid():
+                thread = ThreadModel(
+                    user=request.user,
+                    receiver=receiver
+                )
+                thread.save()
+
+                return redirect('thread', pk=thread.pk)
+        except:
+            messages.info(request, "This user is not your friend")
+            return redirect('create-thread')
+
+class ThreadView(View):
+    def get(self, request, pk, *args, **kwargs):
+        form = MessageForm()
+        thread = ThreadModel.objects.get(pk=pk)
+        message_list = MessageModel.objects.filter(thread__pk__contains=pk)
+        context = {
+            'thread': thread,
+            'form': form,
+            'message_list': message_list
+        }
+
+        return render(request, 'thread.html', context)
+
+class CreateMessage(View):
+    def post(self, request, pk, *args, **kwargs):
+        thread = ThreadModel.objects.get(pk=pk)
+        if thread.receiver == request.user:
+            receiver = thread.user
+        else:
+            receiver = thread.receiver
+
+        message = MessageModel(
+            thread=thread,
+            sender_user=request.user,
+            receiver_user=receiver,
+            body=request.POST.get('message')
+        )
+
+        message.save()
+        return redirect('thread', pk=pk)
